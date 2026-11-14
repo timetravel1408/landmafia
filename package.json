@@ -1,0 +1,30 @@
+{
+  "name": "bengaluru-landmafia",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Real-time multiplayer territory game on the roads of Bengaluru",
+  "type": "module",
+  "workspaces": [
+    "shared",
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "build:graph": "tsx tools/build-graph.ts",
+    "build:graph:demo": "tsx tools/build-graph.ts --demo",
+    "dev:server": "npm run dev -w server",
+    "dev:client": "npm run dev -w client",
+    "dev": "concurrently -n server,client -c yellow,cyan \"npm run dev -w server\" \"npm run dev -w client\"",
+    "build": "npm run build -w client",
+    "start": "npm run start -w server",
+    "test": "vitest run",
+    "typecheck": "tsc -p server --noEmit && tsc -p client --noEmit && tsc -p tools --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "concurrently": "^9.1.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

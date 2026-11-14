@@ -1,0 +1,9 @@
+node_modules
+**/node_modules
+client/dist
+data/cache
+data/leaderboard.sqlite*
+.env
+.git
+.claude
+*.log

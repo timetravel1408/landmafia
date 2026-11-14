@@ -1,0 +1,6 @@
+# Cloudflare Pages headers: the client must store nothing.
+/*
+  Cache-Control: no-store, max-age=0
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: interest-cohort=()

@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <meta http-equiv="Cache-Control" content="no-store" />
+    <title>Bengaluru LandMafia</title>
+    <meta name="description" content="Real-time multiplayer land-grab on the real roads of Bengaluru. Nothing is saved." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M8 56V26l8-6v-8h8v8l8-6 8 6v-8h8v8l8 6v30z' fill='%23d4a52c' stroke='%233a2412' stroke-width='3'/%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=IM+Fell+English:ital@0;1&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="map"></div>
+
+    <!-- ===================== Landing ===================== -->
+    <section id="landing" class="screen">
+      <div class="landing-inner">
+        <header class="title-plate wood">
+          <div class="title-crest">⚜</div>
+          <h1>Bengaluru<br /><span>LandMafia</span></h1>
+          <p class="tagline">March the real roads. Close the loop. Rule the city.</p>
+        </header>
+
+        <div class="landing-grid">
+          <div class="panel parchment join-panel">
+            <h2>Declare thy name</h2>
+            <form id="join-form" autocomplete="off">
+              <input id="nickname" maxlength="16" placeholder="Baron of Basavanagudi" spellcheck="false" autocomplete="off" />
+              <button type="submit" class="seal-btn" id="join-btn"><span>Claim your first plot</span></button>
+            </form>
+            <p class="status" id="join-status"></p>
+            <ul class="rules">
+              <li><b>Move on roads.</b> Arrow keys / WASD pick the road at the next junction — or click a glowing junction.</li>
+              <li><b>Close loops to claim.</b> Leave your land, trace a path, return home: every block inside is yours.</li>
+              <li><b>Bigger barons can't be taken by smaller ones.</b> Grow before you raid a rival.</li>
+              <li><b>Hunt the Kingpin.</b> Cut the richest baron's trail for a ₹50 cr bounty and a slice of their empire.</li>
+              <li><b>Upkeep tax.</b> Above 5 km² your frontier crumbles every minute unless you keep conquering.</li>
+            </ul>
+            <p class="ephemeral">Nothing is saved. Close the tab and your empire is gone.</p>
+          </div>
+
+          <div class="panel parchment board-panel">
+            <h2>Hall of Barons <small>all-time top 20</small></h2>
+            <ol id="landing-board" class="board"><li class="muted">Summoning the scribes…</li></ol>
+          </div>
+        </div>
+        <footer class="credits">Road data © OpenStreetMap contributors · Imagery © Google · Original art, no external sprites</footer>
+      </div>
+    </section>
+
+    <!-- ===================== Game HUD ===================== -->
+    <section id="hud" class="hidden">
+      <div class="hud-top wood">
+        <div class="hud-stat"><label>Wealth</label><b id="hud-wealth" class="gold">₹0 cr</b></div>
+        <div class="hud-stat"><label>Land</label><b id="hud-land">0.00 km²</b></div>
+        <div class="hud-stat"><label>Rank</label><b id="hud-rank">–</b></div>
+        <div class="hud-stat"><label>Upkeep</label><b id="hud-tax">–</b></div>
+      </div>
+
+      <aside class="scoreboard parchment" id="scoreboard">
+        <h3>Barons of the Realm</h3>
+        <ol id="score-list"></ol>
+        <div id="score-me" class="score-me"></div>
+      </aside>
+
+      <div class="hud-buttons">
+        <button class="seal-btn small" id="btn-follow" title="Follow my knight">⌖</button>
+        <button class="seal-btn small" id="btn-board" title="Hall of Barons">♛</button>
+        <button class="seal-btn small" id="btn-sound" title="Sound (off)">🔇</button>
+      </div>
+
+      <div class="minimap wood" id="minimap-wrap"><canvas id="minimap" width="200" height="190"></canvas></div>
+
+      <div class="controls-hint" id="controls-hint">
+        <span class="desk">⬆⬇⬅➡ / WASD choose road · click a glowing junction · drag to look around</span>
+        <span class="touch">Tap a glowing road · swipe to steer · ⌖ to follow</span>
+      </div>
+
+      <div id="kingpin-arrow" class="kingpin-arrow hidden"><div class="crown">♛</div><div class="tip">▲</div></div>
+      <div id="toasts"></div>
+      <div id="banner" class="banner hidden"></div>
+      <div id="tooltip" class="tooltip parchment hidden"></div>
+
+      <div id="dpad" class="dpad">
+        <button data-h="0">▲</button><button data-h="270">◀</button><button data-h="90">▶</button><button data-h="180">▼</button>
+      </div>
+
+      <div id="board-modal" class="modal hidden">
+        <div class="panel parchment">
+          <h2>Hall of Barons <small>all-time top 20</small></h2>
+          <ol id="game-board" class="board"></ol>
+          <button class="seal-btn" id="board-close"><span>Close</span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== Game over ===================== -->
+    <section id="gameover" class="screen hidden">
+      <div class="panel parchment gameover-panel">
+        <div class="broken">⚔</div>
+        <h2>Thy empire has fallen</h2>
+        <p id="go-reason" class="muted"></p>
+        <dl class="go-stats">
+          <dt>Peak wealth</dt><dd id="go-wealth" class="gold">–</dd>
+          <dt>Peak land</dt><dd id="go-area">–</dd>
+          <dt>Best rank</dt><dd id="go-rank">–</dd>
+        </dl>
+        <p id="go-top20" class="go-top20"></p>
+        <button class="seal-btn" id="go-again"><span>Play again</span></button>
+      </div>
+    </section>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

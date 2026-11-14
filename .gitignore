@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.env
+*.log
+.DS_Store
+# raw Overpass download cache (re-downloadable, large)
+data/cache/
+# leaderboard fallback store
+data/leaderboard.sqlite*

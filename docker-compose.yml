@@ -1,0 +1,40 @@
+# docker compose up -d --build                 -> server + Redis on http://localhost:8080
+# docker compose --profile tunnel up -d --build  -> also exposes it through a Cloudflare Tunnel
+services:
+  redis:
+    image: redis:7.4-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+
+  server:
+    build:
+      context: .
+      args:
+        VITE_SERVER_URL: ${VITE_SERVER_URL:-}
+    env_file: .env
+    environment:
+      REDIS_URL: redis://redis:6379
+      PORT: 8080
+    ports:
+      - "8080:8080"
+    depends_on:
+      - redis
+    restart: unless-stopped
+    stop_grace_period: 15s
+
+  # Cloudflare Tunnel: in the Zero Trust dashboard create a tunnel, add a public hostname
+  # (e.g. landmafia.example.com -> http://server:8080) and put its token in .env.
+  cloudflared:
+    image: cloudflare/cloudflared:2024.12.2
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on:
+      - server
+    restart: unless-stopped
+    profiles: ["tunnel"]
+
+volumes:
+  redis-data:
