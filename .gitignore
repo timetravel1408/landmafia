@@ -7,3 +7,4 @@ dist/
 data/cache/
 # leaderboard fallback store
 data/leaderboard.sqlite*
+*.log.err
